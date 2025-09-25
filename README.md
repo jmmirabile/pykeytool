@@ -45,12 +45,12 @@ java -Djavax.net.ssl.keyStore=myapp-prod.p12 -Djavax.net.ssl.keyStoreType=PKCS12
 
 **Latest Release:** [![GitHub release](https://img.shields.io/github/v/release/yourusername/pykeytool)](https://github.com/yourusername/pykeytool/releases/latest)
 
-| Platform | Download |
-|----------|----------|
-| **Linux (x64)** | [pykeytool-linux-x64](https://github.com/yourusername/pykeytool/releases/latest/download/pykeytool-linux-x64) |
-| **macOS (Intel)** | [pykeytool-macos-intel](https://github.com/yourusername/pykeytool/releases/latest/download/pykeytool-macos-intel) |
-| **macOS (Apple Silicon)** | [pykeytool-macos-arm64](https://github.com/yourusername/pykeytool/releases/latest/download/pykeytool-macos-arm64) |
-| **Windows (x64)** | [pykeytool-windows-x64.exe](https://github.com/yourusername/pykeytool/releases/latest/download/pykeytool-windows-x64.exe) |
+| Platform | Download                                                                                                                  |
+|----------|---------------------------------------------------------------------------------------------------------------------------|
+| **Linux (x64)** | [pykeytool-linux-x64](https://github.com/jmmirabile/pykeytool/releases/latest/download/pykeytool-linux-x64)               |
+| **macOS (Intel)** | [pykeytool-macos-intel](https://github.com/jmmirabile/pykeytool/releases/latest/download/pykeytool-macos-intel)         |
+| **macOS (Apple Silicon)** | [pykeytool-macos-arm64](https://github.com/jmmirabile/pykeytool/releases/latest/download/pykeytool-macos-arm64)         |
+| **Windows (x64)** | [pykeytool-windows-x64.exe](https://github.com/jmmirabile/pykeytool/releases/latest/download/pykeytool-windows-x64.exe) |
 
 
 ### Option 2: Build from Source
