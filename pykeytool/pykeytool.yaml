@@ -1,0 +1,17 @@
+org_templates:
+  client:
+    OU: Client Certificates
+    O: Example Corporation
+    C: US
+  server:
+    OU: Server Certificates
+    O: Example Corporation
+    C: US
+  ca:
+    OU: Certificate Authority
+    O: Example Corporation
+    C: US
+defaults:
+  keystore_type: PKCS12
+  key_size: 4096
+  validity_days: 365

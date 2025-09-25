@@ -2,18 +2,20 @@
 
 A sane alternative to Java's keytool for certificate management. No more cryptic error messages, chain validation failures, or "why won't this just work?" moments.
 
-** Developed fast with the help of Claude Code. But all my idea and my direction, analysis.
-
 ## Why PyKeyTool?
 
 If you've ever tried to use Java's keytool, you know the pain:
 - `Failed to establish chain from reply` - What does this even mean?
-- Can't specify custom truststores for certificate imports
-- Can't export private keys you already own
-- Confusing parameter combinations and unclear error messages
-- Forces you to mix CA certificates with private keys
+- Can't specify custom truststores for certificate imports.
+- Can't import a cert into keystore without having the chain, but are in possession of the private key? Ridiculous!
+- Can't export private keys you already own.
+- Confusing parameter combinations and unclear error messages.
+- Forces you to mix CA certificates with private keys! What? Why?
+  - What happened to separation of concerns? 
+  - A person or process updating the CA certs would then need the password to the keystore? No way!
 
-PyKeyTool fixes all of this with a clean, intuitive interface that just works.
+PyKeyTool fixes all of this with a clean, intuitive interface that just works. Written with Python, deployed as a 
+single file. No python imports, etc. Run it locally for testing or on your servers. 
 
 ## Features
 
