@@ -51,7 +51,7 @@ java -Djavax.net.ssl.keyStore=myapp-prod.p12 -Djavax.net.ssl.keyStoreType=PKCS12
 git clone https://github.com/yourusername/pykeytool.git
 cd pykeytool
 pip install -r requirements.txt
-pyinstaller pykeytool.spec
+pyinstaller pykeytool-linux.spec
 ```
 
 ## Configuration
