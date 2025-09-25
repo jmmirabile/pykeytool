@@ -135,6 +135,11 @@ Server installation:
   sudo pykeytool --init-config  # Creates /etc/pykeytool/pykeytool.conf
 
 Use --init-config to create a default config file.
+
+- It's best to always set the --alias option to the CN of the cert for all keystore related commands. As the CN(common name) 
+  is typically unique. In practice, store a single key pair in the pkcs12 files. Storing multiple key pairs in the same 
+  file, implies that the keystore is shared by more than one system or process, which implies access to more than one private key.
+  
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -282,9 +287,17 @@ Use --init-config to create a default config file.
             with open(args.import_cert, 'rb') as f:
                 cert = x509.load_pem_x509_certificate(f.read())
 
+            alias = ""
+            if args.alias:
+                alias = args.alias
+            else:
+                cn = cert.subject.get_attributes_for_oid(x509.NameOID.COMMON_NAME)
+                if cn:
+                    alais = cn[0].value
+
             # Create new PKCS12 with key + cert
             p12_data = pkcs12.serialize_key_and_certificates(
-                name=args.alias.encode(),
+                name=alias.encode(),
                 key=private_key,
                 cert=cert,
                 cas=None,
