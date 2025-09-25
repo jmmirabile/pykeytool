@@ -293,7 +293,7 @@ Use --init-config to create a default config file.
             else:
                 cn = cert.subject.get_attributes_for_oid(x509.NameOID.COMMON_NAME)
                 if cn:
-                    alais = cn[0].value
+                    alias = cn[0].value
 
             # Create new PKCS12 with key + cert
             p12_data = pkcs12.serialize_key_and_certificates(
