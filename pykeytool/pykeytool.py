@@ -8,6 +8,7 @@ import argparse
 import sys
 import os
 import yaml
+import getpass
 from pathlib import Path
 from cryptography import x509
 from cryptography.x509.oid import NameOID
@@ -164,9 +165,10 @@ Use --init-config to create a default config file.
 
     # Common options
     parser.add_argument('--keystore', default='keystore.p12', help='Keystore file (default: keystore.p12)')
+    #parser.add_argument('--keystore', help='Keystore file (default: [cn].p12)')
     parser.add_argument('--alias', default='mykey', help='Key alias (default: mykey)')
-    parser.add_argument('--storepass', default='changeit', help='Current keystore password (default: changeit)')
-    parser.add_argument('--new-storepass', help='New keystore password (for --change-password)')
+    #parser.add_argument('--storepass', default='changeit',
+    #                    help='Current keystore password (default: changeit, will prompt for --change-password)')
 
     args = parser.parse_args()
 
@@ -237,13 +239,19 @@ Use --init-config to create a default config file.
             with open(csr_file, 'wb') as f:
                 f.write(csr.public_bytes(serialization.Encoding.PEM))
 
+            # Get keystore password
+            #if args.storepass:
+            password = "changeit"
+            if args.keystore:
+                password = getpass.getpass(f"Enter password for keystore {cn}.p12: ")
+
             # Create empty PKCS12 with just the private key
             p12_data = pkcs12.serialize_key_and_certificates(
                 name=cert_name.encode(),
                 key=private_key,
                 cert=None,  # No cert yet
                 cas=None,
-                encryption_algorithm=serialization.BestAvailableEncryption(args.storepass.encode())
+                encryption_algorithm=serialization.BestAvailableEncryption(password.encode())
             )
 
             # Use cert name as keystore name if not specified
@@ -261,9 +269,14 @@ Use --init-config to create a default config file.
         elif args.import_cert:
             print(f"Importing certificate from: {args.import_cert}")
 
+            # Get keystore password
+            #if args.storepass:
+            #    password = args.storepass
+            password = getpass.getpass(f"Enter password for keystore {args.keystore}: ")
+
             # Load existing keystore
             with open(args.keystore, 'rb') as f:
-                private_key, _, _ = pkcs12.load_key_and_certificates(f.read(), args.storepass.encode())
+                private_key, _, _ = pkcs12.load_key_and_certificates(f.read(), password.encode())
 
             # Load certificate
             with open(args.import_cert, 'rb') as f:
@@ -275,7 +288,7 @@ Use --init-config to create a default config file.
                 key=private_key,
                 cert=cert,
                 cas=None,
-                encryption_algorithm=serialization.BestAvailableEncryption(args.storepass.encode())
+                encryption_algorithm=serialization.BestAvailableEncryption(password.encode())
             )
 
             with open(args.keystore, 'wb') as f:
@@ -287,8 +300,14 @@ Use --init-config to create a default config file.
         elif args.export_key:
             print(f"Exporting private key from: {args.keystore}")
 
+            # Get keystore password
+            #if args.storepass:
+            #    password = args.storepass
+            #else:
+            password = getpass.getpass(f"Enter password for keystore {args.keystore}: ")
+
             with open(args.keystore, 'rb') as f:
-                private_key, cert, _ = pkcs12.load_key_and_certificates(f.read(), args.storepass.encode())
+                private_key, cert, _ = pkcs12.load_key_and_certificates(f.read(), password.encode())
 
             if private_key:
                 key_file = f"{args.alias}.key"
@@ -313,8 +332,14 @@ Use --init-config to create a default config file.
                 print("Keystore does not exist")
                 return
 
+            # Get keystore password
+            #if args.storepass:
+            #password = args.storepass
+            #else:
+            password = getpass.getpass(f"Enter password for keystore {args.keystore}: ")
+
             with open(args.keystore, 'rb') as f:
-                private_key, cert, ca_certs = pkcs12.load_key_and_certificates(f.read(), args.storepass.encode())
+                private_key, cert, ca_certs = pkcs12.load_key_and_certificates(f.read(), password.encode())
 
             print(f"Alias: {args.alias}")
             if private_key:
@@ -326,15 +351,31 @@ Use --init-config to create a default config file.
                 print(f"  ✓ CA certificates: {len(ca_certs)}")
 
         elif args.change_password:
-            if not args.new_storepass:
-                print("Error: --change-password requires --new-storepass")
-                sys.exit(1)
-
             print(f"Changing password for keystore: {args.keystore}")
 
+            # Always prompt for current password (we don't know what it is)
+            current_password = getpass.getpass("Enter current keystore password: ")
+
+            # Get new password with confirmation
+            while True:
+                new_password = getpass.getpass("Enter new keystore password: ")
+                if not new_password:
+                    print("Password cannot be empty. Please try again.")
+                    continue
+
+                confirm_password = getpass.getpass("Confirm new keystore password: ")
+                if new_password == confirm_password:
+                    break
+                else:
+                    print("Passwords do not match. Please try again.")
+
             # Load keystore with current password
-            with open(args.keystore, 'rb') as f:
-                private_key, cert, ca_certs = pkcs12.load_key_and_certificates(f.read(), args.storepass.encode())
+            try:
+                with open(args.keystore, 'rb') as f:
+                    private_key, cert, ca_certs = pkcs12.load_key_and_certificates(f.read(), current_password.encode())
+            except Exception as e:
+                print(f"Error: Unable to load keystore with provided password: {e}")
+                sys.exit(1)
 
             # Re-save with new password
             p12_data = pkcs12.serialize_key_and_certificates(
@@ -342,7 +383,7 @@ Use --init-config to create a default config file.
                 key=private_key,
                 cert=cert,
                 cas=ca_certs,
-                encryption_algorithm=serialization.BestAvailableEncryption(args.new_storepass.encode())
+                encryption_algorithm=serialization.BestAvailableEncryption(new_password.encode())
             )
 
             with open(args.keystore, 'wb') as f:
@@ -350,7 +391,6 @@ Use --init-config to create a default config file.
 
             print(f"✓ Password changed successfully")
             print(f"✓ Keystore: {args.keystore}")
-            print(f"→ Use --storepass {args.new_storepass} for future operations")
 
     except FileNotFoundError as e:
         print(f"Error: File not found - {e.filename}")
