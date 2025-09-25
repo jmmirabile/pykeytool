@@ -118,7 +118,7 @@ def build_dn_from_template(config, template_name, cn, overrides=None):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='PyKeyTool - Sane certificate management',
+        description='PyKeyTool - Easy certificate keystore management',
         epilog="""
 Installation suggestion:
   sudo cp pykeytool /usr/local/bin/
