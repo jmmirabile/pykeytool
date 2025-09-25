@@ -146,6 +146,7 @@ Use --init-config to create a default config file.
     group.add_argument('--list', action='store_true', help='List keystore contents')
     group.add_argument('--list-templates', action='store_true', help='List available org templates')
     group.add_argument('--init-config', action='store_true', help='Create default config file')
+    group.add_argument('--change-password', action='store_true', help='Change keystore password')
 
     # Certificate parameters
     cert_group = parser.add_argument_group('certificate parameters')
@@ -164,7 +165,8 @@ Use --init-config to create a default config file.
     # Common options
     parser.add_argument('--keystore', default='keystore.p12', help='Keystore file (default: keystore.p12)')
     parser.add_argument('--alias', default='mykey', help='Key alias (default: mykey)')
-    parser.add_argument('--storepass', default='changeit', help='Keystore password (default: changeit)')
+    parser.add_argument('--storepass', default='changeit', help='Current keystore password (default: changeit)')
+    parser.add_argument('--new-storepass', help='New keystore password (for --change-password)')
 
     args = parser.parse_args()
 
@@ -322,6 +324,33 @@ Use --init-config to create a default config file.
                 print(f"      Expires: {cert.not_valid_after}")
             if ca_certs:
                 print(f"  ✓ CA certificates: {len(ca_certs)}")
+
+        elif args.change_password:
+            if not args.new_storepass:
+                print("Error: --change-password requires --new-storepass")
+                sys.exit(1)
+
+            print(f"Changing password for keystore: {args.keystore}")
+
+            # Load keystore with current password
+            with open(args.keystore, 'rb') as f:
+                private_key, cert, ca_certs = pkcs12.load_key_and_certificates(f.read(), args.storepass.encode())
+
+            # Re-save with new password
+            p12_data = pkcs12.serialize_key_and_certificates(
+                name=args.alias.encode(),
+                key=private_key,
+                cert=cert,
+                cas=ca_certs,
+                encryption_algorithm=serialization.BestAvailableEncryption(args.new_storepass.encode())
+            )
+
+            with open(args.keystore, 'wb') as f:
+                f.write(p12_data)
+
+            print(f"✓ Password changed successfully")
+            print(f"✓ Keystore: {args.keystore}")
+            print(f"→ Use --storepass {args.new_storepass} for future operations")
 
     except FileNotFoundError as e:
         print(f"Error: File not found - {e.filename}")
