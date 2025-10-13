@@ -43,7 +43,7 @@ java -Djavax.net.ssl.keyStore=myapp-prod.p12 -Djavax.net.ssl.keyStoreType=PKCS12
 
 ### Option 1: Download Pre-built Binary
 
-**Latest Release:** [![GitHub release](https://img.shields.io/github/v/release/yourusername/pykeytool)](https://github.com/yourusername/pykeytool/releases/latest)
+**Latest Release:** [![GitHub release](https://img.shields.io/github/v/release/jmmirabile/pykeytool)](https://github.com/jmmirabile/pykeytool/releases/latest)
 
 | Platform | Download                                                                                                                  |
 |----------|---------------------------------------------------------------------------------------------------------------------------|
@@ -208,7 +208,7 @@ Found a bug or want a feature? Please open an issue or submit a pull request!
 
 ## License
 
-MIT License - see LICENSE file for details.
+Apache 2.0 License - see LICENSE file for details.
 
 ## About
 
