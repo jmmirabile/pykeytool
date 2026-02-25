@@ -217,5 +217,3 @@ Built by someone who got tired of keytool's nonsense and decided to fix it prope
 From the team behind enterprise certificate management solutions - because if you're going to solve a problem, solve it right.
 
 ---
-
-**Need enterprise certificate management?** Check out our [certificate lifecycle platform](https://yourplatform.com) for automated enrollment, renewal, and multi-organization certificate orchestration.
